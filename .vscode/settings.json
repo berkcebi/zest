@@ -1,0 +1,11 @@
+{
+    "Lua.workspace.library": [
+        "${env:HOME}/Developer/PlaydateSDK/CoreLibs"
+    ],
+    "Lua.runtime.special": {
+        "import": "require"
+    },
+    "Lua.diagnostics.globals": [
+        "playdate"
+    ]
+}
