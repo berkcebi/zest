@@ -5,17 +5,18 @@ local rows <const> = 9
 local columns <const> = 12
 local cursorAnimationDuration <const> = 250
 
+Battleground = nil
 class("Battleground", {
     grid = {},
     cursor = nil,
     cursorColumn = 1,
     cursorRow = 1,
-    cursorAnimator = nil }, Zest).extends()
+    cursorAnimator = nil }).extends()
 
-function Zest.Battleground:init()
-    Zest.Battleground.super.init(self)
+function Battleground:init()
+    Battleground.super.init(self)
 
-    local hexWidth, hexHeight = Zest.Hex.size()
+    local hexWidth, hexHeight = Hex.size()
     local width = columns * hexWidth + hexWidth / 2
     local height = rows * (hexHeight * 3 / 4) + hexHeight / 4
     local offsetX = (playdate.display.getWidth() - width) / 2
@@ -28,7 +29,7 @@ function Zest.Battleground:init()
             local x = offsetX + (column - 0.5) * hexWidth + (row % 2 == 1 and hexWidth / 2 or 0)
             local y = offsetY + (row - 1) * (hexHeight * 3 / 4) + hexHeight / 2
 
-            local hex = Zest.Hex()
+            local hex = Hex()
             hex:moveTo(x, y)
             hex:add()
 
@@ -36,13 +37,13 @@ function Zest.Battleground:init()
         end
     end
 
-    self.cursor = Zest.Cursor()
+    self.cursor = Cursor()
     self.cursor:add()
 
     self:reloadCursorPosition(false)
 end
 
-function Zest.Battleground:update()
+function Battleground:update()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
         self.cursorColumn = math.max(self.cursorColumn - 1, 1)
         self:reloadCursorPosition(true)
@@ -67,13 +68,13 @@ function Zest.Battleground:update()
     end
 end
 
-function Zest.Battleground:getHexPosition(column, row)
+function Battleground:getHexPosition(column, row)
     local hex = self.grid[column][row]
 
     return hex.x, hex.y
 end
 
-function Zest.Battleground:reloadCursorPosition(animate)
+function Battleground:reloadCursorPosition(animate)
     local x, y = self:getHexPosition(self.cursorColumn, self.cursorRow)
 
     if animate then

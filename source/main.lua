@@ -1,5 +1,3 @@
-Zest = {}
-
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
@@ -10,7 +8,7 @@ local graphics <const> = playdate.graphics
 local battleground = nil
 
 local function initialize()
-    battleground = Zest.Battleground()
+    battleground = Battleground()
 end
 
 initialize()

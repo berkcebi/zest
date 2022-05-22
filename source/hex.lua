@@ -2,14 +2,15 @@ local graphics <const> = playdate.graphics
 local width <const> = 30
 local height <const> = 32
 
-class("Hex", {}, Zest).extends(graphics.sprite)
+Hex = nil
+class("Hex").extends(graphics.sprite)
 
-function Zest.Hex.size()
+function Hex.size()
     return width, height
 end
 
-function Zest.Hex:init()
-    Zest.Hex.super.init(self)
+function Hex:init()
+    Hex.super.init(self)
 
     local image = graphics.image.new(width + 1, height + 1)
 
