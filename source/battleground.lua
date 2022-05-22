@@ -11,7 +11,8 @@ class("Battleground", {
     cursor = nil,
     cursorColumn = 1,
     cursorRow = 1,
-    cursorAnimator = nil }).extends()
+    cursorAnimator = nil,
+    cursorSamplePlayer = nil }).extends()
 
 function Battleground:init()
     Battleground.super.init(self)
@@ -41,21 +42,27 @@ function Battleground:init()
     self.cursor:add()
 
     self:reloadCursorPosition(false)
+
+    self.cursorSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/cursor")
 end
 
 function Battleground:update()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
         self.cursorColumn = math.max(self.cursorColumn - 1, 1)
         self:reloadCursorPosition(true)
+        self.cursorSamplePlayer:play()
     elseif playdate.buttonJustPressed(playdate.kButtonRight) then
         self.cursorColumn = math.min(self.cursorColumn + 1, columns)
         self:reloadCursorPosition(true)
+        self.cursorSamplePlayer:play()
     elseif playdate.buttonJustPressed(playdate.kButtonUp) then
         self.cursorRow = math.max(self.cursorRow - 1, 1)
         self:reloadCursorPosition(true)
+        self.cursorSamplePlayer:play()
     elseif playdate.buttonJustPressed(playdate.kButtonDown) then
         self.cursorRow = math.min(self.cursorRow + 1, rows)
         self:reloadCursorPosition(true)
+        self.cursorSamplePlayer:play()
     end
 
     if self.cursorAnimator then
