@@ -1,10 +1,10 @@
 local graphics <const> = playdate.graphics
 local size <const> = 9
 
-class("Cursor").extends(graphics.sprite)
+class("Cursor", {}, Zest).extends(graphics.sprite)
 
-function Cursor:init()
-    Cursor.super.init(self)
+function Zest.Cursor:init()
+    Zest.Cursor.super.init(self)
 
     local image = graphics.image.new(size, size)
 
