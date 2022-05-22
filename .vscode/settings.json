@@ -1,6 +1,6 @@
 {
     "Lua.workspace.library": [
-        "${env:HOME}/Developer/PlaydateSDK/CoreLibs"
+        "${env:PLAYDATE_SDK_PATH}/CoreLibs"
     ],
     "Lua.runtime.special": {
         "import": "require"
