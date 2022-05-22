@@ -47,20 +47,22 @@ function Battleground:init()
 end
 
 function Battleground:update()
+    local cursorColumn = self.cursorColumn
+    local cursorRow = self.cursorRow
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
-        self.cursorColumn = math.max(self.cursorColumn - 1, 1)
-        self:reloadCursorPosition(true)
-        self.cursorSamplePlayer:play()
+        cursorColumn = math.max(self.cursorColumn - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonRight) then
-        self.cursorColumn = math.min(self.cursorColumn + 1, columns)
-        self:reloadCursorPosition(true)
-        self.cursorSamplePlayer:play()
+        cursorColumn = math.min(self.cursorColumn + 1, columns)
     elseif playdate.buttonJustPressed(playdate.kButtonUp) then
-        self.cursorRow = math.max(self.cursorRow - 1, 1)
-        self:reloadCursorPosition(true)
-        self.cursorSamplePlayer:play()
+        cursorRow = math.max(self.cursorRow - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonDown) then
-        self.cursorRow = math.min(self.cursorRow + 1, rows)
+        cursorRow = math.min(self.cursorRow + 1, rows)
+    end
+
+    if self.cursorColumn ~= cursorColumn or self.cursorRow ~= cursorRow then
+        self.cursorColumn = cursorColumn
+        self.cursorRow = cursorRow
+
         self:reloadCursorPosition(true)
         self.cursorSamplePlayer:play()
     end
