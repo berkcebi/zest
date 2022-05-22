@@ -3,12 +3,14 @@ import "hex"
 
 local rows <const> = 9
 local columns <const> = 12
+local cursorAnimationDuration <const> = 250
 
 class("Battleground", {
     grid = {},
     cursor = nil,
     cursorColumn = 1,
-    cursorRow = 1 }).extends()
+    cursorRow = 1,
+    cursorAnimator = nil }).extends()
 
 function Battleground:init()
     Battleground.super.init(self)
@@ -37,22 +39,31 @@ function Battleground:init()
     self.cursor = Cursor()
     self.cursor:add()
 
-    self:reloadCursorPosition()
+    self:reloadCursorPosition(false)
 end
 
 function Battleground:update()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
         self.cursorColumn = math.max(self.cursorColumn - 1, 1)
-        self:reloadCursorPosition()
+        self:reloadCursorPosition(true)
     elseif playdate.buttonJustPressed(playdate.kButtonRight) then
         self.cursorColumn = math.min(self.cursorColumn + 1, columns)
-        self:reloadCursorPosition()
+        self:reloadCursorPosition(true)
     elseif playdate.buttonJustPressed(playdate.kButtonUp) then
         self.cursorRow = math.max(self.cursorRow - 1, 1)
-        self:reloadCursorPosition()
+        self:reloadCursorPosition(true)
     elseif playdate.buttonJustPressed(playdate.kButtonDown) then
         self.cursorRow = math.min(self.cursorRow + 1, rows)
-        self:reloadCursorPosition()
+        self:reloadCursorPosition(true)
+    end
+
+    if self.cursorAnimator then
+        local x, y = self.cursorAnimator:currentValue()
+        self.cursor:moveTo(x, y)
+
+        if self.cursorAnimator:ended() then
+            self.cursorAnimator = nil
+        end
     end
 end
 
@@ -62,7 +73,15 @@ function Battleground:getHexPosition(column, row)
     return hex.x, hex.y
 end
 
-function Battleground:reloadCursorPosition()
+function Battleground:reloadCursorPosition(animate)
     local x, y = self:getHexPosition(self.cursorColumn, self.cursorRow)
-    self.cursor:moveTo(x, y)
+
+    if animate then
+        local from = playdate.geometry.point.new(self.cursor.x, self.cursor.y)
+        local to = playdate.geometry.point.new(x, y)
+
+        self.cursorAnimator = playdate.graphics.animator.new(cursorAnimationDuration, from, to, playdate.easingFunctions.outBack)
+    else
+        self.cursor:moveTo(x, y)
+    end
 end
