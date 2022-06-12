@@ -12,7 +12,10 @@ class("Battleground", {
     cursorColumn = 1,
     cursorRow = 1,
     cursorAnimator = nil,
-    cursorSamplePlayer = nil }).extends()
+    cursorSamplePlayer = nil,
+    selectedColumn = nil,
+    selectedRow = nil
+}).extends()
 
 function Battleground:init()
     Battleground.super.init(self)
@@ -77,6 +80,16 @@ function Battleground:update()
         if self.cursorAnimator:ended() then
             self.cursorAnimator = nil
         end
+    end
+
+    if playdate.buttonJustPressed(playdate.kButtonA) then
+        if self.selectedColumn ~= nil and self.selectedRow ~= nil then
+            self.grid[self.selectedColumn][self.selectedRow]:setSelected(false)
+        end
+        self.grid[self.cursorColumn][self.cursorRow]:setSelected(true)
+
+        self.selectedColumn = self.cursorColumn
+        self.selectedRow = self.cursorRow
     end
 end
 
