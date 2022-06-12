@@ -1,6 +1,9 @@
 import "cursor"
 import "hex"
 
+local geometry <const> = playdate.geometry
+local graphics <const> = playdate.graphics
+local sound <const> = playdate.sound
 local rows <const> = 9
 local columns <const> = 11
 local cursorAnimationDuration <const> = 250
@@ -9,12 +12,10 @@ Battleground = nil
 class("Battleground", {
     grid = {},
     cursor = nil,
-    cursorColumn = 1,
-    cursorRow = 1,
+    cursorPoint = geometry.point.new(1, 1),
     cursorAnimator = nil,
     cursorSamplePlayer = nil,
-    selectedColumn = nil,
-    selectedRow = nil,
+    selectedPoint = nil,
     selectSamplePlayer = nil,
     deselectSamplePlayer = nil,
 }).extends()
@@ -49,31 +50,29 @@ function Battleground:init()
     self.cursor:setZIndex(2)
     self.cursor:add()
 
-    self:reloadCursorPosition(false)
+    self:_moveCursor(false)
 
-    self.cursorSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/cursor")
-    self.selectSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/select")
-    self.deselectSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/deselect")
+    self.cursorSamplePlayer = sound.sampleplayer.new("assets/sfx/cursor")
+    self.selectSamplePlayer = sound.sampleplayer.new("assets/sfx/select")
+    self.deselectSamplePlayer = sound.sampleplayer.new("assets/sfx/deselect")
 end
 
 function Battleground:update()
-    local cursorColumn = self.cursorColumn
-    local cursorRow = self.cursorRow
+    local cursorPoint = self.cursorPoint:copy()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
-        cursorColumn = math.max(self.cursorColumn - 1, 1)
+        cursorPoint.x = math.max(cursorPoint.x - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonRight) then
-        cursorColumn = math.min(self.cursorColumn + 1, columns)
+        cursorPoint.x = math.min(cursorPoint.x + 1, columns)
     elseif playdate.buttonJustPressed(playdate.kButtonUp) then
-        cursorRow = math.max(self.cursorRow - 1, 1)
+        cursorPoint.y = math.max(cursorPoint.y - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonDown) then
-        cursorRow = math.min(self.cursorRow + 1, rows)
+        cursorPoint.y = math.min(cursorPoint.y + 1, rows)
     end
 
-    if self.cursorColumn ~= cursorColumn or self.cursorRow ~= cursorRow then
-        self.cursorColumn = cursorColumn
-        self.cursorRow = cursorRow
+    if self.cursorPoint ~= cursorPoint then
+        self.cursorPoint = cursorPoint
 
-        self:reloadCursorPosition(true)
+        self:_moveCursor(true)
         self.cursorSamplePlayer:play()
     end
 
@@ -87,42 +86,36 @@ function Battleground:update()
     end
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        if self.selectedColumn ~= nil and self.selectedRow ~= nil then
-            self.grid[self.selectedColumn][self.selectedRow]:setSelected(false)
+        if self.selectedPoint ~= nil then
+            self:_getHex(self.selectedPoint):setSelected(false)
         end
 
-        if self.selectedColumn == self.cursorColumn and self.selectedRow == self.cursorRow then
-            self.selectedColumn = nil
-            self.selectedRow = nil
-
+        if self.selectedPoint == self.cursorPoint then
+            self.selectedPoint = nil
             self.deselectSamplePlayer:play()
         else
-            self.grid[self.cursorColumn][self.cursorRow]:setSelected(true)
+            self:_getHex(self.cursorPoint):setSelected(true)
 
-            self.selectedColumn = self.cursorColumn
-            self.selectedRow = self.cursorRow
-
+            self.selectedPoint = self.cursorPoint:copy()
             self.selectSamplePlayer:play()
         end
     end
 end
 
-function Battleground:getHexPosition(column, row)
-    local hex = self.grid[column][row]
-
-    return hex.x, hex.y
+function Battleground:_getHex(point)
+    return self.grid[point.x][point.y]
 end
 
-function Battleground:reloadCursorPosition(animate)
-    local x, y = self:getHexPosition(self.cursorColumn, self.cursorRow)
+function Battleground:_moveCursor(animate)
+    local hex = self:_getHex(self.cursorPoint)
 
     if animate then
-        local from = playdate.geometry.point.new(self.cursor.x, self.cursor.y)
-        local to = playdate.geometry.point.new(x, y)
+        local from = geometry.point.new(self.cursor.x, self.cursor.y)
+        local to = geometry.point.new(hex.x, hex.y)
 
-        self.cursorAnimator = playdate.graphics.animator.new(cursorAnimationDuration, from, to,
+        self.cursorAnimator = graphics.animator.new(cursorAnimationDuration, from, to,
             playdate.easingFunctions.outBack)
     else
-        self.cursor:moveTo(x, y)
+        self.cursor:moveTo(hex.x, hex.y)
     end
 end

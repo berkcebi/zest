@@ -17,7 +17,7 @@ end
 function Hex:init()
     Hex.super.init(self)
 
-    self:reloadImage()
+    self:_reloadImage()
 end
 
 function Hex:setSelected(isSelected)
@@ -26,10 +26,10 @@ function Hex:setSelected(isSelected)
     end
 
     self.isSelected = isSelected
-    self:reloadImage()
+    self:_reloadImage()
 end
 
-function Hex:reloadImage()
+function Hex:_reloadImage()
     local image
     if self.isSelected then
         image = graphics.image.new("assets/images/hex-selected")
