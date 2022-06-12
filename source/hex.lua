@@ -32,7 +32,7 @@ end
 function Hex:reloadImage()
     local image
     if self.isSelected then
-        image = graphics.image.new("assets/images/hexSelected")
+        image = graphics.image.new("assets/images/hex-selected")
     else
         image = graphics.image.new("assets/images/hex")
     end
