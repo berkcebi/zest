@@ -2,7 +2,7 @@ import "cursor"
 import "hex"
 
 local rows <const> = 9
-local columns <const> = 12
+local columns <const> = 11
 local cursorAnimationDuration <const> = 250
 
 Battleground = nil
@@ -18,20 +18,22 @@ function Battleground:init()
     Battleground.super.init(self)
 
     local hexWidth, hexHeight = Hex.size()
+    local hexOffsetY = Hex.offsetY()
     local width = columns * hexWidth + hexWidth / 2
-    local height = rows * (hexHeight * 3 / 4) + hexHeight / 4
-    local offsetX = (playdate.display.getWidth() - width) / 2
-    local offsetY = (playdate.display.getHeight() - height) / 2
+    local height = rows * (hexHeight - hexOffsetY) + hexOffsetY
+    local marginX = (playdate.display.getWidth() - width) / 2
+    local marginY = (playdate.display.getHeight() - height) / 2
 
     for column = 1, columns do
         self.grid[column] = {}
 
         for row = 1, rows do
-            local x = offsetX + (column - 0.5) * hexWidth + (row % 2 == 1 and hexWidth / 2 or 0)
-            local y = offsetY + (row - 1) * (hexHeight * 3 / 4) + hexHeight / 2
+            local x = marginX + hexWidth / 2 + (column - 1) * hexWidth + (row % 2 == 1 and hexWidth / 2 or 0)
+            local y = marginY + hexHeight / 2 + (row - 1) * (hexHeight - hexOffsetY)
 
             local hex = Hex()
             hex:moveTo(x, y)
+            hex:setZIndex(0)
             hex:add()
 
             self.grid[column][row] = hex
@@ -39,6 +41,7 @@ function Battleground:init()
     end
 
     self.cursor = Cursor()
+    self.cursor:setZIndex(2)
     self.cursor:add()
 
     self:reloadCursorPosition(false)
@@ -90,7 +93,8 @@ function Battleground:reloadCursorPosition(animate)
         local from = playdate.geometry.point.new(self.cursor.x, self.cursor.y)
         local to = playdate.geometry.point.new(x, y)
 
-        self.cursorAnimator = playdate.graphics.animator.new(cursorAnimationDuration, from, to, playdate.easingFunctions.outBack)
+        self.cursorAnimator = playdate.graphics.animator.new(cursorAnimationDuration, from, to,
+            playdate.easingFunctions.outBack)
     else
         self.cursor:moveTo(x, y)
     end
