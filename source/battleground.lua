@@ -14,7 +14,9 @@ class("Battleground", {
     cursorAnimator = nil,
     cursorSamplePlayer = nil,
     selectedColumn = nil,
-    selectedRow = nil
+    selectedRow = nil,
+    selectSamplePlayer = nil,
+    deselectSamplePlayer = nil,
 }).extends()
 
 function Battleground:init()
@@ -50,6 +52,8 @@ function Battleground:init()
     self:reloadCursorPosition(false)
 
     self.cursorSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/cursor")
+    self.selectSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/select")
+    self.deselectSamplePlayer = playdate.sound.sampleplayer.new("assets/sfx/deselect")
 end
 
 function Battleground:update()
@@ -86,10 +90,20 @@ function Battleground:update()
         if self.selectedColumn ~= nil and self.selectedRow ~= nil then
             self.grid[self.selectedColumn][self.selectedRow]:setSelected(false)
         end
-        self.grid[self.cursorColumn][self.cursorRow]:setSelected(true)
 
-        self.selectedColumn = self.cursorColumn
-        self.selectedRow = self.cursorRow
+        if self.selectedColumn == self.cursorColumn and self.selectedRow == self.cursorRow then
+            self.selectedColumn = nil
+            self.selectedRow = nil
+
+            self.deselectSamplePlayer:play()
+        else
+            self.grid[self.cursorColumn][self.cursorRow]:setSelected(true)
+
+            self.selectedColumn = self.cursorColumn
+            self.selectedRow = self.cursorRow
+
+            self.selectSamplePlayer:play()
+        end
     end
 end
 
