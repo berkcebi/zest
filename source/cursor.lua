@@ -1,5 +1,5 @@
 local graphics <const> = playdate.graphics
-local size <const> = 11
+local size <const> = 9
 local borderSize <const> = 2
 
 Cursor = nil

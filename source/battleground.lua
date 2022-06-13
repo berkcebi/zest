@@ -1,5 +1,6 @@
 import "cursor"
 import "hex"
+import "troop"
 
 local geometry <const> = playdate.geometry
 local graphics <const> = playdate.graphics
@@ -55,6 +56,12 @@ function Battleground:init()
     self.cursorSamplePlayer = sound.sampleplayer.new("assets/sfx/cursor")
     self.selectSamplePlayer = sound.sampleplayer.new("assets/sfx/select")
     self.deselectSamplePlayer = sound.sampleplayer.new("assets/sfx/deselect")
+
+    local troop = Troop("J", 2)
+    local hex = self:_getHex(geometry.point.new(3, 4))
+    troop:moveTo(hex.x, hex.y)
+    troop:setZIndex(1)
+    troop:add()
 end
 
 function Battleground:update()
