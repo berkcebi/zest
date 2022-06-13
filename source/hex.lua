@@ -30,12 +30,13 @@ function Hex:setSelected(isSelected)
 end
 
 function Hex:_reloadImage()
-    local image
+    local imagePath
     if self.isSelected then
-        image = graphics.image.new("assets/images/hex-selected")
+        imagePath = "assets/images/hex-selected"
     else
-        image = graphics.image.new("assets/images/hex")
+        imagePath = "assets/images/hex"
     end
 
+    local image = graphics.image.new(imagePath)
     self:setImage(image)
 end
