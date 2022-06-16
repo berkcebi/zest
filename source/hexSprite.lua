@@ -3,24 +3,24 @@ local width <const> = 32
 local height <const> = 30
 local offsetY <const> = 6
 
-Hex = nil
-class("Hex", { isSelected = false }).extends(graphics.sprite)
+HexSprite = nil
+class("HexSprite", { isSelected = false }).extends(graphics.sprite)
 
-function Hex.size()
+function HexSprite.size()
     return width, height
 end
 
-function Hex.offsetY()
+function HexSprite.offsetY()
     return offsetY
 end
 
-function Hex:init()
-    Hex.super.init(self)
+function HexSprite:init()
+    HexSprite.super.init(self)
 
     self:_reloadImage()
 end
 
-function Hex:setSelected(isSelected)
+function HexSprite:setSelected(isSelected)
     if self.isSelected == isSelected then
         return
     end
@@ -29,7 +29,7 @@ function Hex:setSelected(isSelected)
     self:_reloadImage()
 end
 
-function Hex:_reloadImage()
+function HexSprite:_reloadImage()
     local imagePath
     if self.isSelected then
         imagePath = "assets/images/hex-selected"

@@ -1,6 +1,6 @@
-import "cursor"
-import "hex"
-import "troop"
+import "cursorSprite"
+import "hexSprite"
+import "troopSprite"
 
 local geometry <const> = playdate.geometry
 local graphics <const> = playdate.graphics
@@ -9,23 +9,27 @@ local rows <const> = 9
 local columns <const> = 11
 local cursorAnimationDuration <const> = 250
 
-Battleground = nil
-class("Battleground", {
+BattleScene = nil
+class("BattleScene", {
+    battle = nil,
     grid = {},
-    cursor = nil,
+    cursorSprite = nil,
     cursorPoint = geometry.point.new(1, 1),
     cursorAnimator = nil,
     cursorSamplePlayer = nil,
     selectedPoint = nil,
     selectSamplePlayer = nil,
     deselectSamplePlayer = nil,
+    troopSprites = {}
 }).extends()
 
-function Battleground:init()
-    Battleground.super.init(self)
+function BattleScene:init(battle)
+    BattleScene.super.init(self)
 
-    local hexWidth, hexHeight = Hex.size()
-    local hexOffsetY = Hex.offsetY()
+    self.battle = battle
+
+    local hexWidth, hexHeight = HexSprite.size()
+    local hexOffsetY = HexSprite.offsetY()
     local width = columns * hexWidth + hexWidth / 2
     local height = rows * (hexHeight - hexOffsetY) + hexOffsetY
     local marginX = (playdate.display.getWidth() - width) / 2
@@ -38,33 +42,38 @@ function Battleground:init()
             local x = marginX + hexWidth / 2 + (column - 1) * hexWidth + (row % 2 == 1 and hexWidth / 2 or 0)
             local y = marginY + hexHeight / 2 + (row - 1) * (hexHeight - hexOffsetY)
 
-            local hex = Hex()
-            hex:moveTo(x, y)
-            hex:setZIndex(0)
-            hex:add()
+            local hexSprite = HexSprite()
+            hexSprite:moveTo(x, y)
+            hexSprite:setZIndex(0)
+            hexSprite:add()
 
-            self.grid[column][row] = hex
+            self.grid[column][row] = hexSprite
         end
     end
 
-    self.cursor = Cursor()
-    self.cursor:setZIndex(2)
-    self.cursor:add()
+    self.cursorSprite = CursorSprite()
+    self.cursorSprite:setZIndex(2)
+    self.cursorSprite:add()
 
     self:_moveCursor(false)
+
+    for _, deployedTroop in ipairs(self.battle.deployedTroops) do
+        local troopSprite = TroopSprite(deployedTroop.troop)
+
+        local hexSprite = self:_getHex(deployedTroop.point)
+        troopSprite:moveTo(hexSprite.x, hexSprite.y)
+        troopSprite:setZIndex(1)
+        troopSprite:add()
+
+        table.insert(self.troopSprites, troopSprite)
+    end
 
     self.cursorSamplePlayer = sound.sampleplayer.new("assets/sfx/cursor")
     self.selectSamplePlayer = sound.sampleplayer.new("assets/sfx/select")
     self.deselectSamplePlayer = sound.sampleplayer.new("assets/sfx/deselect")
-
-    local troop = Troop("J", 2)
-    local hex = self:_getHex(geometry.point.new(3, 4))
-    troop:moveTo(hex.x, hex.y)
-    troop:setZIndex(1)
-    troop:add()
 end
 
-function Battleground:update()
+function BattleScene:update()
     local cursorPoint = self.cursorPoint:copy()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
         cursorPoint.x = math.max(cursorPoint.x - 1, 1)
@@ -85,7 +94,7 @@ function Battleground:update()
 
     if self.cursorAnimator then
         local x, y = self.cursorAnimator:currentValue()
-        self.cursor:moveTo(x, y)
+        self.cursorSprite:moveTo(x, y)
 
         if self.cursorAnimator:ended() then
             self.cursorAnimator = nil
@@ -109,20 +118,20 @@ function Battleground:update()
     end
 end
 
-function Battleground:_getHex(point)
+function BattleScene:_getHex(point)
     return self.grid[point.x][point.y]
 end
 
-function Battleground:_moveCursor(animate)
-    local hex = self:_getHex(self.cursorPoint)
+function BattleScene:_moveCursor(animate)
+    local hexSprite = self:_getHex(self.cursorPoint)
 
     if animate then
-        local from = geometry.point.new(self.cursor.x, self.cursor.y)
-        local to = geometry.point.new(hex.x, hex.y)
+        local from = geometry.point.new(self.cursorSprite.x, self.cursorSprite.y)
+        local to = geometry.point.new(hexSprite.x, hexSprite.y)
 
         self.cursorAnimator = graphics.animator.new(cursorAnimationDuration, from, to,
             playdate.easingFunctions.outBack)
     else
-        self.cursor:moveTo(hex.x, hex.y)
+        self.cursorSprite:moveTo(hexSprite.x, hexSprite.y)
     end
 end
