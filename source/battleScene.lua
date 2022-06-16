@@ -5,8 +5,6 @@ import "troopSprite"
 local geometry <const> = playdate.geometry
 local graphics <const> = playdate.graphics
 local sound <const> = playdate.sound
-local rows <const> = 9
-local columns <const> = 11
 local cursorAnimationDuration <const> = 250
 
 BattleScene = nil
@@ -28,6 +26,8 @@ function BattleScene:init(battle)
 
     self.battle = battle
 
+    local columns = self.battle.columns
+    local rows = self.battle.rows
     local hexWidth, hexHeight = HexSprite.size()
     local hexOffsetY = HexSprite.offsetY()
     local width = columns * hexWidth + hexWidth / 2
@@ -78,11 +78,11 @@ function BattleScene:update()
     if playdate.buttonJustPressed(playdate.kButtonLeft) then
         cursorPoint.x = math.max(cursorPoint.x - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonRight) then
-        cursorPoint.x = math.min(cursorPoint.x + 1, columns)
+        cursorPoint.x = math.min(cursorPoint.x + 1, self.battle.columns)
     elseif playdate.buttonJustPressed(playdate.kButtonUp) then
         cursorPoint.y = math.max(cursorPoint.y - 1, 1)
     elseif playdate.buttonJustPressed(playdate.kButtonDown) then
-        cursorPoint.y = math.min(cursorPoint.y + 1, rows)
+        cursorPoint.y = math.min(cursorPoint.y + 1, self.battle.rows)
     end
 
     if self.cursorPoint ~= cursorPoint then
