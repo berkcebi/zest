@@ -1,6 +1,6 @@
 local graphics <const> = playdate.graphics
 
-CursorSprite = nil
+CursorSprite = {}
 class("CursorSprite").extends(graphics.sprite)
 
 function CursorSprite:init()

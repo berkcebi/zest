@@ -7,7 +7,7 @@ local graphics <const> = playdate.graphics
 local sound <const> = playdate.sound
 local cursorAnimationDuration <const> = 250
 
-BattleScene = nil
+BattleScene = {}
 class("BattleScene", {
     battle = nil,
     grid = {},

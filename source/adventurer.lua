@@ -1,4 +1,4 @@
-Adventurer = nil
+Adventurer = {}
 class("Adventurer", { troops = {} }).extends()
 
 function Adventurer:addTroop(troop)

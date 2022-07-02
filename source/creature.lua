@@ -1,4 +1,4 @@
-Creature = nil
+Creature = {}
 class("Creature", {
     name = "",
     health = 0,

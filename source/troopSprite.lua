@@ -7,7 +7,7 @@ local titleFont <const> = graphics.font.new("assets/fonts/font-pixieval-large-bl
 local countFont <const> = graphics.font.new("assets/fonts/Bitmore")
 countFont:setTracking(1)
 
-TroopSprite = nil
+TroopSprite = {}
 class("TroopSprite", { troop = nil }).extends(graphics.sprite)
 
 function TroopSprite:init(troop)

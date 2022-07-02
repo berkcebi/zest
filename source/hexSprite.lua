@@ -3,7 +3,7 @@ local width <const> = 32
 local height <const> = 30
 local offsetY <const> = 6
 
-HexSprite = nil
+HexSprite = {}
 class("HexSprite", { isSelected = false }).extends(graphics.sprite)
 
 function HexSprite.size()

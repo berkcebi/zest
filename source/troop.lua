@@ -1,4 +1,4 @@
-Troop = nil
+Troop = {}
 class("Troop", {
     creature = nil,
     count = 0

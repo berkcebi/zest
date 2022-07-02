@@ -1,4 +1,4 @@
-Battle = nil
+Battle = {}
 class("Battle", {
     columns = 11,
     rows = 9,
