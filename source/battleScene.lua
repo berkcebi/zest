@@ -20,7 +20,8 @@ class("BattleScene", {
     selectedDeployedTroop = nil,
     selectSamplePlayer = nil,
     deselectSamplePlayer = nil,
-    troopSprites = {}
+    troopSprites = {},
+    declineSamplePlayer = nil
 }).extends()
 
 function BattleScene:init(battle)
@@ -78,6 +79,7 @@ function BattleScene:init(battle)
     self.cursorSamplePlayer = sound.sampleplayer.new("assets/sfx/cursor")
     self.selectSamplePlayer = sound.sampleplayer.new("assets/sfx/select")
     self.deselectSamplePlayer = sound.sampleplayer.new("assets/sfx/deselect")
+    self.declineSamplePlayer = sound.sampleplayer.new("assets/sfx/decline")
 end
 
 function BattleScene:update()
@@ -110,15 +112,22 @@ function BattleScene:update()
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
         if self.selectedDeployedTroop then
-            if self.selectedDeployedTroop.point ~= self.cursorPoint then
+            if self.cursorPoint == self.selectedDeployedTroop.point then
+                self.selectedDeployedTroop = nil
+                self:_reloadSelectionIndicator()
+
+                self.deselectSamplePlayer:play()
+            elseif self:_getDeployedTroop(self.cursorPoint) then
+                self.declineSamplePlayer:play()
+            else
                 self.selectedDeployedTroop.point = self.cursorPoint
                 self:_reloadDeployedTroop(self.selectedDeployedTroop)
+
+                self.selectedDeployedTroop = nil
+                self:_reloadSelectionIndicator()
+
+                self.deselectSamplePlayer:play()
             end
-
-            self.selectedDeployedTroop = nil
-            self:_reloadSelectionIndicator()
-
-            self.deselectSamplePlayer:play()
         else
             local deployedTroop = self:_getDeployedTroop(self.cursorPoint)
             if deployedTroop then
