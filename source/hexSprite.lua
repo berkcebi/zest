@@ -4,7 +4,7 @@ local height <const> = 30
 local offsetY <const> = 6
 
 HexSprite = {}
-class("HexSprite", { isSelected = false }).extends(graphics.sprite)
+class("HexSprite").extends(graphics.sprite)
 
 function HexSprite.size()
     return width, height
@@ -17,26 +17,6 @@ end
 function HexSprite:init()
     HexSprite.super.init(self)
 
-    self:_reloadImage()
-end
-
-function HexSprite:setSelected(isSelected)
-    if self.isSelected == isSelected then
-        return
-    end
-
-    self.isSelected = isSelected
-    self:_reloadImage()
-end
-
-function HexSprite:_reloadImage()
-    local imagePath
-    if self.isSelected then
-        imagePath = "assets/images/hex-selected"
-    else
-        imagePath = "assets/images/hex"
-    end
-
-    local image = graphics.image.new(imagePath)
+    local image = graphics.image.new("assets/images/hex")
     self:setImage(image)
 end

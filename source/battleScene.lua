@@ -1,5 +1,6 @@
 import "cursorSprite"
 import "hexSprite"
+import "selectionIndicatorSprite"
 import "troopSprite"
 
 local geometry <const> = playdate.geometry
@@ -15,7 +16,8 @@ class("BattleScene", {
     cursorPoint = geometry.point.new(1, 1),
     cursorAnimator = nil,
     cursorSamplePlayer = nil,
-    selectedPoint = nil,
+    selectionIndicatorSprite = nil,
+    selectedDeployedTroop = nil,
     selectSamplePlayer = nil,
     deselectSamplePlayer = nil,
     troopSprites = {}
@@ -52,17 +54,22 @@ function BattleScene:init(battle)
     end
 
     self.cursorSprite = CursorSprite()
-    self.cursorSprite:setZIndex(2)
+    self.cursorSprite:setZIndex(3)
     self.cursorSprite:add()
 
     self:_moveCursor(false)
+
+    self.selectionIndicatorSprite = SelectionIndicatorSprite()
+    self.selectionIndicatorSprite:setZIndex(1)
+    self.selectionIndicatorSprite:setVisible(false)
+    self.selectionIndicatorSprite:add()
 
     for _, deployedTroop in ipairs(self.battle.deployedTroops) do
         local troopSprite = TroopSprite(deployedTroop.troop)
 
         local hexSprite = self:_getHex(deployedTroop.point)
         troopSprite:moveTo(hexSprite.x, hexSprite.y)
-        troopSprite:setZIndex(1)
+        troopSprite:setZIndex(2)
         troopSprite:add()
 
         table.insert(self.troopSprites, troopSprite)
@@ -102,24 +109,40 @@ function BattleScene:update()
     end
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        if self.selectedPoint ~= nil then
-            self:_getHex(self.selectedPoint):setSelected(false)
-        end
+        if self.selectedDeployedTroop then
+            if self.selectedDeployedTroop.point ~= self.cursorPoint then
+                self.selectedDeployedTroop.point = self.cursorPoint
+                self:_reloadDeployedTroop(self.selectedDeployedTroop)
+            end
 
-        if self.selectedPoint == self.cursorPoint then
-            self.selectedPoint = nil
+            self.selectedDeployedTroop = nil
+            self:_reloadSelectionIndicator()
+
             self.deselectSamplePlayer:play()
         else
-            self:_getHex(self.cursorPoint):setSelected(true)
+            local deployedTroop = self:_getDeployedTroop(self.cursorPoint)
+            if deployedTroop then
+                self.selectedDeployedTroop = deployedTroop
+                self:_reloadSelectionIndicator()
 
-            self.selectedPoint = self.cursorPoint:copy()
-            self.selectSamplePlayer:play()
+                self.selectSamplePlayer:play()
+            end
         end
     end
 end
 
 function BattleScene:_getHex(point)
     return self.grid[point.x][point.y]
+end
+
+function BattleScene:_getDeployedTroop(point)
+    for _, deployedTroop in ipairs(self.battle.deployedTroops) do
+        if deployedTroop.point == point then
+            return deployedTroop
+        end
+    end
+
+    return nil
 end
 
 function BattleScene:_moveCursor(animate)
@@ -133,5 +156,25 @@ function BattleScene:_moveCursor(animate)
             playdate.easingFunctions.outBack)
     else
         self.cursorSprite:moveTo(hexSprite.x, hexSprite.y)
+    end
+end
+
+function BattleScene:_reloadSelectionIndicator()
+    if self.selectedDeployedTroop then
+        local hexSprite = self:_getHex(self.selectedDeployedTroop.point)
+        self.selectionIndicatorSprite:moveTo(hexSprite.x, hexSprite.y)
+        self.selectionIndicatorSprite:setVisible(true)
+    else
+        self.selectionIndicatorSprite:setVisible(false)
+    end
+end
+
+function BattleScene:_reloadDeployedTroop(deployedTroop)
+    local hexSprite = self:_getHex(deployedTroop.point)
+    for _, troopSprite in ipairs(self.troopSprites) do
+        if troopSprite.troop == self.selectedDeployedTroop.troop then
+            troopSprite:moveTo(hexSprite.x, hexSprite.y)
+            return
+        end
     end
 end
